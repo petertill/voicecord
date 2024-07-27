@@ -38,7 +38,7 @@ class VoiceCordError(Exception):
 
 
 class VoiceClient:
-    async def __init__(self, ip, token, guild_id, channel_id):
+    def __init__(self, ip, token, guild_id, channel_id):
         self.IP = ip
         self.TOKEN = token
         self.GUILD_ID = guild_id
@@ -55,6 +55,7 @@ class VoiceClient:
 
         self.final_audio_data = b''
         print(f"{colors.WARNING}[VoiceCord]{colors.ENDC} Voice client initialized")
+        #return None
 
     async def connect(self):
         while True:
