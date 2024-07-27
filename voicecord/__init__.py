@@ -38,7 +38,8 @@ class VoiceCordError(Exception):
 
 
 class VoiceClient:
-    async def __init__(self, token, guild_id, channel_id):
+    async def __init__(self, ip, token, guild_id, channel_id):
+        self.IP = ip
         self.TOKEN = token
         self.GUILD_ID = guild_id
         self.CHANNEL_ID = channel_id
@@ -233,7 +234,7 @@ class VoiceClient:
                         "d": {
                             "protocol": "udp",
                             "data": {
-                                "address": "84.3.225.182",
+                                "address": self.IP,
                                 "port": port,
                                 "mode": "xsalsa20_poly1305"
                             }
