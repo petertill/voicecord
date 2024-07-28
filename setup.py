@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
   
 setuptools.setup( 
     name="voicecord", 
-    version="2.1.1", 
+    version="2.1.5", 
     author="Peter Till", 
     author_email="ptertill@gmail.com", 
     packages=["voicecord"], 
