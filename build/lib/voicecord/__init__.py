@@ -1,13 +1,16 @@
 import asyncio
 import io
-import json
 import select
+import time
+import websockets
+import json
 import socket
 import struct
-import time
-
-import nacl
-import websockets
+import nacl.secret
+import nacl.utils
+import nacl.public
+import nacl.encoding
+from nacl.bindings import crypto_secretbox_open
 
 
 def __init__():
