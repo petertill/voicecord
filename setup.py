@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
   
 setuptools.setup( 
     name="voicecord", 
-    version="2.0.5", 
+    version="2.1.0", 
     author="Peter Till", 
     author_email="ptertill@gmail.com", 
     packages=["voicecord"], 
@@ -15,5 +15,5 @@ setuptools.setup(
     url="https://github.com/petertill/voicecord", 
     license='MIT', 
     python_requires='>=3.8', 
-    install_requires=[] 
+    install_requires=["pynacl"]
 ) 

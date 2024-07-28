@@ -185,17 +185,6 @@ class VoiceClient:
         }))"""
 
     
-    async def __heartbeat(interval, websocket):
-        while True:
-            await asyncio.sleep(interval / 1000)
-            try:
-                await websocket.send(json.dumps({
-                    "op": 3,
-                    "d": int(time.time() * 1000)
-                }))
-                print("Heartbeat sent")
-            except websockets.exceptions.ConnectionClosedError:
-                print("Failed to send heartbeat: connection closed")
 
     
     async def __listen_voice_server(self, websocket):
@@ -219,7 +208,6 @@ class VoiceClient:
                     asyncio.create_task(self.__heartbeat(interval, websocket))
                 elif event["op"] == 2:
                     print(colors.VOICECORD_TAG, "Got voice ready event, setting up UDP socket...")
-                    print(event)
                     self.VOICE_IP = event["d"]["ip"]
                     self.VOICE_PORT = event["d"]["port"]
                     udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -242,17 +230,32 @@ class VoiceClient:
                         }
                     }))
                 elif event["op"] == 4:
-                    print("WOAHHHHH!!!!!") #SUCCESSFUL TO THIS POINT
-                    print(event)
+                    #print("WOAHHHHH!!!!!") #SUCCESSFUL TO THIS POINT
+                    #print(event)
                     await self.__handle_session_description(event["d"], udp_socket, ssrc)
                     #await test_udp()
                 else:
-                    print("Received voice server event:", event)
+                    pass
+                    #print("Received voice server event:", event)
                     #await handle_voice_server_event(event)
                 
+    async def __heartbeat(self, interval, websocket):
+        #print args
+        while True:
+            await asyncio.sleep(interval / 1000)
+            try:
+                await websocket.send(json.dumps({
+                    "op": 3,
+                    "d": int(time.time() * 1000)
+                }))
+                print("Heartbeat sent")
+            except websockets.exceptions.ConnectionClosedError:
+                print("Failed to send heartbeat: connection closed")
                 
     
-    async def __perform_ip_discovery(udp_socket, server_ip, server_port, ssrc):
+    async def __perform_ip_discovery(self, udp_socket, server_ip, server_port, ssrc):
+
+        # Create a discovery packet
         packet = struct.pack('>HHI64sH', 0x1, 70, ssrc, b'\0' * 64, 0)
 
         # Send discovery packet to the server
@@ -264,11 +267,19 @@ class VoiceClient:
         try:
             # Receive the response from the server
             response, _ = udp_socket.recvfrom(74)
-            return response[4:68].decode("utf-8"), struct.unpack_from(">H", response, 70)[0]
-           # print(f"Received response: {response}")
         except socket.timeout:
             print("IP discovery timeout")
             return None, None
+
+        if len(response) < 74:
+            print("Received malformed response")
+            return None, None
+
+        # Extract IP and port from the response
+        ip = socket.inet_ntoa(response[8:12])
+        port = struct.unpack('>H', response[72:74])[0]
+
+        return ip, port
         
 
     async def __handle_session_description(self, data, udp_socket, ssrc):
